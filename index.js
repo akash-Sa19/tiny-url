@@ -1,10 +1,13 @@
 const express = require("express");
 const path = require("node:path");
-const urlRoute = require("./routes/url");
 const connectToMongoDB = require("./connect");
 const URL = require("./models/url");
-const staticRoute = require("./routes/staticRouter");
 
+const urlRoute = require("./routes/url");
+const staticRoute = require("./routes/staticRouter");
+const userRoute = require("./routes/user");
+const cookieParser = require("cookie-parser");
+const { restrictToLoggedInUserOnly, checkAuth } = require("./middleware/auth");
 const app = express();
 const PORT = 8001;
 
@@ -18,10 +21,13 @@ app.set("views", path.resolve("./views"));
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // routes
-app.use("/url", urlRoute);
-app.use("/", staticRoute);
+app.use("/url", restrictToLoggedInUserOnly, urlRoute);
+app.use("/", checkAuth, staticRoute);
+app.use("/user", userRoute);
+
 app.get("/url/:shortId", async (req, res) => {
   const shortId = req.params.shortId;
   const entry = await URL.findOneAndUpdate(
