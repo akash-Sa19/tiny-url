@@ -20,12 +20,19 @@ async function handleUserLogin(req, res) {
       error: "Invalid Username or password",
     });
   }
+  // statefull auth
   // const sessionId = uuidv4();
   // setUser(sessionId, user);
   // res.cookie("uid", sessionId);
+
+  // stateless auth
+  // const token = setUser(user);
+  // res.cookie("uid", token);
+  // return res.redirect("/");
+
+  // using headers to auth using Bearer token
   const token = setUser(user);
-  res.cookie("uid", token);
-  return res.redirect("/");
+  return res.json({ token });
 }
 
 module.exports = { handleUserSignup, handleUserLogin };
