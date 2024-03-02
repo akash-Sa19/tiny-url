@@ -25,25 +25,27 @@ app.use(cookieParser());
 
 // routes
 app.use("/url", restrictToLoggedInUserOnly, urlRoute);
+// this checkAuth middleware is not working with stateless authentication
 app.use("/", checkAuth, staticRoute);
+app.use("/", staticRoute);
 app.use("/user", userRoute);
 
-app.get("/url/:shortId", async (req, res) => {
-  const shortId = req.params.shortId;
-  const entry = await URL.findOneAndUpdate(
-    {
-      shortId,
-    },
-    {
-      $push: {
-        visitHistory: {
-          timestamp: Date.now(),
-        },
-      },
-    }
-  );
-  res.redirect(entry.redirectURL);
-});
+// app.get("/url/:shortId", async (req, res) => {
+//   const shortId = req.params.shortId;
+//   const entry = await URL.findOneAndUpdate(
+//     {
+//       shortId,
+//     },
+//     {
+//       $push: {
+//         visitHistory: {
+//           timestamp: Date.now(),
+//         },
+//       },
+//     }
+//   );
+//   res.redirect(entry.redirectURL);
+// });
 
 app.get("/test", async (req, res) => {
   const allUrl = await URL.find({});
